@@ -12,6 +12,7 @@ BUFFSIZE = 1
 
 TOPIC_CLOUD_IN = '/velodyne_points/lidar'
 TOPIC_CLOUD_FILTER = '/cropBox_displayed'
+TOPIC_MARKER = '/display_new_cropBox'
 
 FIELDS = [
     PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
@@ -40,19 +41,27 @@ class Crop :
 		self.marker           = Marker() 
 		self.marker_type      = marker_type
 		rospy.Subscriber(TOPIC_CLOUD_IN, PointCloud2, self.callback_get_cloud)
-
-	def display_marker(self): 
+		self.init_marker()
+	
+	def init_marker(self): 
 		self.marker.lifetime = rospy.Duration(MARKER_LIFETIME)
-		self.marker.type = Marker.BOX 
+		self.marker.type = Marker.CUBE 
 		self.marker.action = Marker.ADD 
-		self.marker.scale.x = 0.3
-		self.marker.scale.y = 0.3
-		self.marker.scale.z = 0
-		self.marker.color.r = 1.0
+		self.marker.header.frame_id = "robot"
+		self.marker.pose.position.x = self.min_vertice[0]
+		self.marker.pose.position.y = 0
+		self.marker.pose.position.z = self.min_vertice[2]
+		self.marker.scale.x = self.max_vertice[0] - self.min_vertice[0]
+		self.marker.scale.y = self.max_vertice[1] - self.min_vertice[1]
+		self.marker.scale.z = self.max_vertice[2] - self.min_vertice[2]
+		self.marker.color.r = 0.5
 		self.marker.color.g = 1.0
 		self.marker.color.b = 0
-		self.marker.color.a = 1.0
+		self.marker.color.a = 0.3
 	
+	def display_marker(self): 
+		self.pubisher_marker_box.publish(self.marker) 
+
 	def sort_cloud(self, axis): 
 		"""Depending on which axis, this method return sorted PointCloud.
 			@axis : which field (could be x, y or z) type : L{type(field_names)}
@@ -64,6 +73,7 @@ class Crop :
 		self.cloud_in_ls = list(pc2.read_points(self.cloud_in, field_names = ("x", "y", "z"), skip_nans=True))
 		header = data.header
 		self.filter_crop(header, self.cloud_in_ls)
+		self.display_marker()
 
 	def filter_crop(self, header, points_list): 
 		"""core function, takes 2 arguments : 
@@ -71,7 +81,6 @@ class Crop :
 			@points_list : type = iterable     
 		"""
 		cloud_filtered=[]
-		rospy.logwarn(self.cloud_in_numpied)
 		for point in points_list: 
 			if ((self.min_vertice[0] < point[0] < self.max_vertice[0]) and (self.min_vertice[1] < point[1] < self.max_vertice[1]) and (self.min_vertice[2] < point[2] < self.max_vertice[2])):
 				cloud_filtered.append(point)
@@ -80,5 +89,5 @@ class Crop :
 	
 if __name__ == "__main__": 
 	rospy.init_node('test_for_crop', log_level=rospy.DEBUG)
-	Crop(min_vertice=(2, -0.5, 0.5), max_vertice=(5, 0.5, 2),cloud_in_topic=TOPIC_CLOUD_IN, topic_pub_cloud=TOPIC_CLOUD_FILTER)
+	Crop(min_vertice=(2, -0.5, 1), max_vertice=(5, 0.5, 2),cloud_in_topic=TOPIC_CLOUD_IN, topic_pub_cloud=TOPIC_CLOUD_FILTER, topic_pub_marker=TOPIC_MARKER)
 	rospy.spin()
