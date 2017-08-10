@@ -19,8 +19,6 @@ FIELDS = [
     PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
 ]
 
-sort_cloud = lambda :  
-
 class Crop : 
 	"""Crop is the class to compute and display cropboxes in python.
 		instance takes : 
