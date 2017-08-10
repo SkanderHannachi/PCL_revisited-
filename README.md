@@ -5,7 +5,7 @@ Will also work on other filters including :
 * cropHulls
 * high/low pass filters
 * clustering 
-*etc.
+* etc.
 
 So feel free to fork and join the project! 
 
