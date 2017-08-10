@@ -9,7 +9,7 @@ import numpy as np
 
 MARKER_LIFETIME = 2
 BUFFSIZE = 1 
-OFFSET_X = 1.5  #depending on which frame you're sensor is rattached, you may or may not want to set position.
+OFFSET_X = 1.5  #depending on which frame your sensor is rattached, you may or may not want to set position.
 
 TOPIC_CLOUD_IN = '/vlp_without_tools/robot'
 TOPIC_CLOUD_FILTER = '/cropBox_displayed'
