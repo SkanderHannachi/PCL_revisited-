@@ -9,8 +9,9 @@ import numpy as np
 
 MARKER_LIFETIME = 2
 BUFFSIZE = 1 
+OFFSET_X = 1.5  #depending on which frame you're sensor is rattached, you may or may not want to set position.
 
-TOPIC_CLOUD_IN = '/velodyne_points/lidar'
+TOPIC_CLOUD_IN = '/vlp_without_tools/robot'
 TOPIC_CLOUD_FILTER = '/cropBox_displayed'
 TOPIC_MARKER = '/display_new_cropBox'
 
@@ -48,7 +49,7 @@ class Crop :
 		self.marker.type = Marker.CUBE 
 		self.marker.action = Marker.ADD 
 		self.marker.header.frame_id = "robot"
-		self.marker.pose.position.x = self.min_vertice[0]
+		self.marker.pose.position.x =  (self.min_vertice[0] + OFFSET_X) 
 		self.marker.pose.position.y = 0
 		self.marker.pose.position.z = self.min_vertice[2]
 		self.marker.scale.x = self.max_vertice[0] - self.min_vertice[0]
@@ -89,5 +90,5 @@ class Crop :
 	
 if __name__ == "__main__": 
 	rospy.init_node('test_for_crop', log_level=rospy.DEBUG)
-	Crop(min_vertice=(2, -0.5, 1), max_vertice=(5, 0.5, 2),cloud_in_topic=TOPIC_CLOUD_IN, topic_pub_cloud=TOPIC_CLOUD_FILTER, topic_pub_marker=TOPIC_MARKER)
+	Crop(min_vertice=(2, -0.5, 0.3), max_vertice=(5, 0.5, 2.2),cloud_in_topic=TOPIC_CLOUD_IN, topic_pub_cloud=TOPIC_CLOUD_FILTER, topic_pub_marker=TOPIC_MARKER)
 	rospy.spin()
